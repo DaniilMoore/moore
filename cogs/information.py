@@ -16,7 +16,7 @@ class Information(commands.Cog):
         emb.add_field(name = 'Информация', value = f'`{prefix}help` `{prefix}user`', inline = False)
         emb.set_thumbnail(url = ctx.guild.icon)
         await ctx.send(embed = emb)
-    
+
     @commands.command()
     @commands.has_permissions(manage_roles = True, kick_members = True)
     async def mhelp(self, ctx):

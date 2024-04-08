@@ -1,17 +1,30 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import asyncio
 from config import settings
 from discord import app_commands
-from datetime import datetime
+from motor.motor_asyncio import AsyncIOMotorClient
+import datetime
+import os
 
 prefix = settings['PREFIX']
 
-class Moderation(commands.Cog):
+usernamemongo = os.environ['username']
+passwordmongo = os.environ['password']
 
+uri = f"mongodb+srv://{usernamemongo}:{passwordmongo}@moore13.9iqj5kj.mongodb.net/?retryWrites=true&w=majority&appName=Moore13"
+mongo_client = AsyncIOMotorClient(uri)
+db = mongo_client["database"]
+ban_collection = db["bans"]
+
+class Moderation(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
-    
+        self.check_bans.start()
+
+    def cog_unload(self):
+        self.check_bans.cancel()
+
     @commands.command()
     @commands.has_permissions(manage_roles = True)
     async def mute(self, ctx, member: discord.Member, time: int, *, reason):
@@ -86,7 +99,38 @@ class Moderation(commands.Cog):
         emb.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar.url)
         emb.set_thumbnail(url = member.avatar.url )
         await ctx.send(embed = emb)
+
+    @commands.command()
+    @commands.has_permissions(ban_members = True)
+    async def ban(self, ctx, member: discord.Member, duration: str, *, reason = None):
+        if reason == None:
+            reason = "Не указана"
+        duration_dict = {"m": "minutes", "h": "hours", "d": "days", "w": "weeks", "y": "years"}
+        duration_value = int(duration[:-1])
+        duration_type = duration[-1]
+        delta = datetime.timedelta(**{duration_dict[duration_type]: duration_value})
+        end_time = datetime.datetime.utcnow() + delta
+        await ban_collection.insert_one({
+            "author_id": ctx.author.id,
+            "user_id": member.id,
+            "guild_id": ctx.guild.id,
+            "end_time": end_time,
+            "reason": reason
+        })
+        await ctx.guild.ban(member, reason=reason)
+        await ctx.send(f'{member.display_name} забанен на {duration_value} {duration_type} по причине: {reason}')
     
+    @tasks.loop(minutes=1)
+    async def check_bans(self):
+        current_time = datetime.datetime.utcnow()
+        async for ban in ban_collection.find({"end_time": {"$lte": current_time}}):
+            guild = self.bot.get_guild(ban["guild_id"])
+            if guild:
+                member = guild.get_member(ban["user_id"])
+                if member:
+                    await guild.unban(member)
+                await ban_collection.delete_one({"_id": ban["_id"]})
+        
     @commands.command()
     @commands.has_permissions(manage_messages = True)
     async def clear(self, ctx, amount = 100):
