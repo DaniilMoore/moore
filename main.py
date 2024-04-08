@@ -12,10 +12,10 @@ client = commands.Bot(command_prefix=prefix, intents=intents)
 client.remove_command('help')
 # keep_alive.keep_alive()
 
-usernamemongo = os.environ['username']
-passwordmongo = os.environ['password']
+# usernamemongo = os.environ['username']
+# passwordmongo = os.environ['password']
 
-uri = f"mongodb+srv://{usernamemongo}:{passwordmongo}@moore13.9iqj5kj.mongodb.net/?retryWrites=true&w=majority&appName=Moore13"
+uri = f"mongodb+srv://moored:daniilmooredb@moore13.9iqj5kj.mongodb.net/?retryWrites=true&w=majority&appName=Moore13"
 mongo_client = AsyncIOMotorClient(uri)
 db = mongo_client["database"]
 
@@ -81,5 +81,5 @@ async def ping(interaction: discord.Interaction):
     bot_latency = round(client.latency * 1000)
     await interaction.response.send_message(f"Pong! {bot_latency} ms.")
 
-my_secret = os.environ['TOKEN']
+my_secret = "OTU5NDQwMjkyNjQ4NDcyNjM4.G_TvF5.R8FgAK4RgSePvN93RoTNydwSNeHa1DCBVe63V0"
 client.run(my_secret)
