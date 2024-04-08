@@ -6,9 +6,9 @@ import os
 
 prefix = settings['PREFIX']
 
-usernamemongo = os.environ['username']
-passwordmongo = os.environ['password']
-uri = f"mongodb+srv://{usernamemongo}:{passwordmongo}@moore13.9iqj5kj.mongodb.net/?retryWrites=true&w=majority&appName=Moore13"
+# usernamemongo = os.environ['username']
+# passwordmongo = os.environ['password']
+uri = f"mongodb+srv://moored:daniilmooredb@moore13.9iqj5kj.mongodb.net/?retryWrites=true&w=majority&appName=Moore13"
 mongo_client = AsyncIOMotorClient(uri)
 db = mongo_client["database"]
 system_channel = db["system_channel"]
