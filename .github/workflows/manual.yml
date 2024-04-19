@@ -10,7 +10,7 @@ jobs:
           python-version: '3.x'
       - name: Install Discord and Motor
         run: |
-          pip install discord motor
+          pip install discord motor PyNaCl
       - uses: actions/checkout@v3
       - name: Run main.py
         run: python /home/runner/work/moore/moore/main.py
