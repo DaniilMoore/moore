@@ -6,6 +6,7 @@ import os
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 
+
 prefix = settings['PREFIX']
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix=prefix, intents=intents)
