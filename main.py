@@ -6,6 +6,7 @@ import os
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 
+token = os.getenv("DISCORD_TOKEN")
 prefix = settings['PREFIX']
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix=prefix, intents=intents)
@@ -81,5 +82,5 @@ async def ping(interaction: discord.Interaction):
     bot_latency = round(client.latency * 1000)
     await interaction.response.send_message(f"Pong! {bot_latency} ms.")
 
-my_secret = "OTU5NDQwMjkyNjQ4NDcyNjM4.G_TvF5.R8FgAK4RgSePvN93RoTNydwSNeHa1DCBVe63V0"
-client.run(my_secret)
+my_secret = "***"
+client.run(token)
